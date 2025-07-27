@@ -5,5 +5,6 @@
 #include<memory>
 #include<mutex>
 #include<assert.h>
+#include<windows.h>
 using namespace std;
 #endif

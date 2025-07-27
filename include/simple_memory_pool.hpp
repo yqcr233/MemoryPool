@@ -7,7 +7,7 @@
 #define SLOT_BASE_SIZE 8
 #define MAX_SLOT_SIZE 512
 struct Slot{ Slot* next; };
-class SimpleMemoryPool{
+class MemoryPool{
     private:
         size_t BlockSize;
         int SlotSize;
@@ -16,18 +16,11 @@ class SimpleMemoryPool{
         Slot* lastSlot;
         Slot* freeList;
         mutex mutexForFreeList;
-        mutex mutexForBlock;    
+        mutex mutexForBlock;   
     private:
-        void init(size_t _SlotSize){
-            assert(_SlotSize > 0);
-            SlotSize = _SlotSize;
-            firstBlock = nullptr;
-            curSlot = nullptr;
-            freeList = nullptr;
-            lastSlot = nullptr;
-        }
+        
         size_t padPointer(char* p, size_t align){ // 计算让指针对齐到槽大小的倍数位置需要填充字节数，align是槽大小
-            return (align - reinterpret_cast<size_t>(p) % align) % align;
+            return (align - reinterpret_cast<size_t>(p) % align) % align; // 将p转换成size_t(整数类型)便于进行取模运算
         }
         void allocateNewBlock() {
             std::cout << "申请一块内存块，SlotSize: " << SlotSize << std::endl;
@@ -45,8 +38,8 @@ class SimpleMemoryPool{
             freeList = nullptr;
         }   
     public:
-        SimpleMemoryPool(size_t _SlotSize, size_t _BlockSize = 4096): BlockSize(_BlockSize) { init(_SlotSize); }
-        ~SimpleMemoryPool() {
+        MemoryPool(size_t _BlockSize = 4096): BlockSize(_BlockSize) {}
+        ~MemoryPool() {
             Slot* cur = firstBlock;
             while(cur) {
                 Slot* next = cur->next;
@@ -55,7 +48,40 @@ class SimpleMemoryPool{
                 cur = next;
             }
         }
+        void init(size_t _SlotSize);
         void* allocate();
         void deallocate(void*);
 };
+
+class HashBucket{
+    public:
+        static void initMemoryPool();
+        static MemoryPool& getMemoryPool(int index);
+        static void* useMemory(size_t size);
+        static void freeMemory(void* ptr, size_t size);
+
+        template<typename T, typename... Args>
+        friend T* newElement(Args&&... args);
+        template<typename T> 
+        friend void deleteElement(T* p);
+};
+
+template<typename T, typename... Args>
+T* newElement(Args&&... args){
+    T* p = nullptr;
+    if((p = reinterpret_cast<T*>(HashBucket::useMemory(sizeof(T)))) != nullptr) { // 从内存池中获取适合内存槽
+        new(p) T(forward<Args>(args)...); // 在对应内存上调用构造函数
+    }
+    return p;
+}
+template<typename T> 
+void deleteElement(T* p){
+    if(p) {
+        // 调用析构并回收内存
+        p->~T();
+        // 这里将p从T*转为void*只要是将内存池与具体类型解耦，避免内存池代码需要模板实例化
+        // freeMemory只需要知道待释放内存首地址和待释放内存大小，与内存中所存储数据类型无关 
+        HashBucket::freeMemory(reinterpret_cast<void*>(p), sizeof(T)); 
+    }
+}
 #endif

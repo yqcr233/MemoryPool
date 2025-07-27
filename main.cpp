@@ -1,9 +1,6 @@
-#include <iostream>
-#include <cmath>
-
-using namespace std;
+#include "test.hpp"
 
 int main(){
-    int a = (-3) % 8;
-    cout << a <<endl;
+    SetConsoleOutputCP(65001); // 设置控制台输出为 UTF-8
+    test_simpel_memory_pool();
 }
