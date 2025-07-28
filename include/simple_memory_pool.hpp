@@ -18,7 +18,6 @@ class MemoryPool{
         mutex mutexForFreeList;
         mutex mutexForBlock;   
     private:
-        
         size_t padPointer(char* p, size_t align){ // 计算让指针对齐到槽大小的倍数位置需要填充字节数，align是槽大小
             return (align - reinterpret_cast<size_t>(p) % align) % align; // 将p转换成size_t(整数类型)便于进行取模运算
         }
@@ -51,6 +50,8 @@ class MemoryPool{
         void init(size_t _SlotSize);
         void* allocate();
         void deallocate(void*);
+
+        friend class FastMemoryPool;
 };
 
 class HashBucket{
@@ -79,7 +80,7 @@ void deleteElement(T* p){
     if(p) {
         // 调用析构并回收内存
         p->~T();
-        // 这里将p从T*转为void*只要是将内存池与具体类型解耦，避免内存池代码需要模板实例化
+        // 这里将p从T*转为void*只要是将内存池与具体类型解耦，避免内存池代码需要模板实例化，使用void*则不需要提前知道p的类型
         // freeMemory只需要知道待释放内存首地址和待释放内存大小，与内存中所存储数据类型无关 
         HashBucket::freeMemory(reinterpret_cast<void*>(p), sizeof(T)); 
     }

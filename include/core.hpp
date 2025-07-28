@@ -6,5 +6,7 @@
 #include<mutex>
 #include<assert.h>
 #include<windows.h>
+#include<cstdint>
+#include<atomic>
 using namespace std;
 #endif
