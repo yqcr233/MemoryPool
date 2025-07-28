@@ -7,7 +7,8 @@ add_executable(memory_pool ${SRC_LIST})
 
 add_subdirectory(ZSimpleMemoryPool)
 add_subdirectory(ZTest)
+add_subdirectory(ZThreeLevelMemoryPool)
 
 target_include_directories(memory_pool PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(memory_pool PRIVATE simple_memory_pool test)
+target_link_libraries(memory_pool PRIVATE simple_memory_pool test three_level_memorypool)
 
