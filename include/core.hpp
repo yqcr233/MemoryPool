@@ -8,5 +8,6 @@
 #include<windows.h>
 #include<cstdint>
 #include<atomic>
+#include<array>
 using namespace std;
 #endif
