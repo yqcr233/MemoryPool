@@ -9,5 +9,6 @@
 #include<cstdint>
 #include<atomic>
 #include<array>
+#include<unordered_map>
 using namespace std;
 #endif

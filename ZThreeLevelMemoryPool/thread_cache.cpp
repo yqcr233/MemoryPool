@@ -1,7 +1,7 @@
 #include "thread_cache.hpp"
 
 void* ThreadCache::allocate(size_t size){
-    if(size == 0) {
+    if(size == 0) { // 至少分配一个对齐大小
         size = ALIGNMENT;
     }
     if(size > MAX_BYTES) {
@@ -42,7 +42,7 @@ void* ThreadCache::fetchFromCentralCache(size_t index){
     // 计算从中心缓存中获取的内存块数量
     while(current != nullptr) {
         batchSize += 1;
-        current = *reinterpret_cast<void**>(start);
+        current = *reinterpret_cast<void**>(current);
     }
     freeListSize[index] += batchSize;
     return result;

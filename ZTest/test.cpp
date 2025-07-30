@@ -6,3 +6,8 @@ void test_simpel_memory_pool() {
     cout<<a->a<<endl;
     deleteElement(a);
 }
+
+void test_three_level_memory_pool(){
+    CentralCache& c_cache = CentralCache::getInstance();
+    ThreadCache* cache = ThreadCache::getInstance();
+}
