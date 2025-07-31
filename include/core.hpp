@@ -10,5 +10,7 @@
 #include<atomic>
 #include<array>
 #include<unordered_map>
+#include<map>
+#include<sys/mman.h>
 using namespace std;
 #endif

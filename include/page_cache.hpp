@@ -12,7 +12,7 @@ class PageCache{
         void deallocateSpan(void* ptr, size_t numPages);
     private:
         PageCache() = default;
-        void systemAlloc(size_t numPages);
+        void* systemAlloc(size_t numPages);
     private:
         struct Span{
             void* pageAddr; // 页起始地址
